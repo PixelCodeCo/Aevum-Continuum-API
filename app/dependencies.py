@@ -1,10 +1,13 @@
+# dependencies.py
 import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from functools import lru_cache
 
-def supabaseClient ():
+@lru_cache
+def get_supabase():
     load_dotenv()
-    url: str = os.environ.get("SUPABASE_DB_URL")
-    key: str = os.environ.get("SUPABASE_DB_KEY")
-    supabase: Client = create_client(url, key)
-    return supabase
+    return create_client(
+        os.environ.get("SUPABASE_DB_URL"),
+        os.environ.get("SUPABASE_DB_KEY")
+    )
