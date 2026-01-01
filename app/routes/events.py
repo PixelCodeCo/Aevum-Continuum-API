@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi import Depends
-from dependencies import get_supabase
-from schemas import EventCreate, EventUpdate
+from app.dependencies import get_supabase
+from app.schemas import EventCreate, EventUpdate
 from uuid import UUID
 
 router = APIRouter(prefix="/events", tags=["events"])
@@ -20,7 +20,7 @@ def get_event(id: UUID, supabase = Depends(get_supabase)):
 def create_event(data: EventCreate, supabase = Depends(get_supabase)):
     response = (
         supabase.table("events")
-        .insert(data.model_dump())
+        .insert(data.model_dump(exclude={"region_ids", "category_ids", "tag_ids"}))
         .execute()
     )
     return response.data
@@ -29,7 +29,7 @@ def create_event(data: EventCreate, supabase = Depends(get_supabase)):
 def update_event(data: EventUpdate, id: UUID, supabase = Depends(get_supabase)):
     response = (
         supabase.table("events")
-        .update(data.model_dump(exclude_unset=True))
+        .update(data.model_dump(exclude_unset=True, exclude={"region_ids", "category_ids", "tag_ids"}))
         .eq("id", str(id))
         .execute()
     )
